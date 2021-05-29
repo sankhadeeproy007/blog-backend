@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import validator from 'express-validator';
 
 import PostModel from '../models/post.js';
 
@@ -22,6 +23,14 @@ export const getPostById = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
+  // Check if there are errors with post body
+  const validationErrors = validator.validationResult(req);
+
+  if (validationErrors.errors.length > 0) {
+    res.status(400).json({ message: 'Invalid input' });
+    return;
+  }
+
   const newPost = new PostModel(req.body);
   try {
     await newPost.save();
@@ -40,7 +49,7 @@ export const updatePost = async (req, res) => {
 
   try {
     const updatedPost = await PostModel.findByIdAndUpdate(_id, req.body, {
-      new: true
+      new: true,
     });
     res.status(200).json(updatedPost);
   } catch (error) {
