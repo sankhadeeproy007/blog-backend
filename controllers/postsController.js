@@ -35,7 +35,9 @@ export const createPost = async (req, res) => {
   const validationErrors = validator.validationResult(req);
 
   if (validationErrors.errors.length > 0) {
-    res.status(400).json({ message: 'Invalid input' });
+    res
+      .status(400)
+      .json({ message: 'Invalid input', error: validationErrors.errors });
     return;
   }
 
@@ -54,6 +56,15 @@ export const updatePost = async (req, res) => {
   // If id doesn't exist return with error
   if (!mongoose.Types.ObjectId.isValid(_id))
     return res.status(404).json({ message: 'No post with given ID found' });
+
+  const validationErrors = validator.validationResult(req);
+
+  if (validationErrors.errors.length > 0) {
+    res
+      .status(400)
+      .json({ message: 'Invalid input', error: validationErrors.errors });
+    return;
+  }
 
   try {
     const updatedPost = await PostModel.findByIdAndUpdate(_id, req.body, {
